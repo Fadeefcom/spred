@@ -1,0 +1,306 @@
+# define FEED_ACCESSTOKEN
+# define ENVIRONMENT
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+
+services:
+
+  playlistapi:
+    container_name: playlist-api
+    image: ${DOCKER_REGISTRY}-playlistapi
+    links:
+      - cosmos-db-emulator
+      - redis
+    depends_on:
+      - cosmos-db-emulator
+      - redis
+    build:
+      context: ../microservices/spred.api.playlist/source/
+      dockerfile: PlaylistService/Dockerfile
+      target: development
+      args:
+      - FEED_ACCESSTOKEN=${FEED_ACCESSTOKEN}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+    networks:
+      - backend
+    environment:
+      - KeyVaultConnectionString=null
+      - ManagedIdentity=null
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+
+  authorizationapi:
+    container_name: authorization-api
+    image: ${DOCKER_REGISTRY}-authorizationapi
+    links:
+      - cosmos-db-emulator
+      - redis
+    depends_on:
+      - cosmos-db-emulator
+      - redis
+    build:
+      context: ../microservices/spred.api.authorazation/source
+      dockerfile: Authorization/Dockerfile
+      target: development
+      args:
+        - FEED_ACCESSTOKEN=${FEED_ACCESSTOKEN}
+        - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+    networks:
+      - backend
+    environment:
+      - KeyVaultConnectionString=null
+      - ManagedIdentity=null
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+
+  trackapi:
+    container_name: track-api
+    image: ${DOCKER_REGISTRY}-trackapi
+    links:
+      - cosmos-db-emulator
+      - redis
+    depends_on:
+      - cosmos-db-emulator
+      - redis
+    build:
+      context: ../microservices/spred.api.track/source
+      dockerfile: TrackService/Dockerfile
+      target: development
+      args:
+      - FEED_ACCESSTOKEN=${FEED_ACCESSTOKEN}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+    networks:
+      - backend
+    environment:
+      - KeyVaultConnectionString=null
+      - ManagedIdentity=null
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+
+  embedderapi:
+    container_name: embedder-api
+    build:
+      context: ../microservices/spred.api.embedder/app
+      dockerfile: Dockerfile
+    ports:
+      - "5050:5050"
+    networks:
+      - backend
+    depends_on:
+      - rabbitmq
+      - trackapi
+    environment:
+      - TRACK_API_URL=http://trackapi:8080
+      - INFERENCE_API_URL=http://inferenceapi:8080
+      - MODEL_PATH=/models/BEATs_iter3_plus_AS2M_finetuned_on_AS2M_cpt2.pt
+      - RABBITMQ_CONNECTION_STRING=amqp://guest:guest@rabbitmq:5672/
+      - APPLICATIONINSIGHTS_CONNECTION_STRING=null
+    volumes:
+      - ../microservices/spred.api.embedder/models:/models
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5050/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  vector-db-api:
+    build:
+      context: ../microservices/spred.api.vector-db
+      dockerfile: Dockerfile
+      target: development
+    container_name: vector-db-api
+    ports:
+      - "8000:8000"
+    environment:
+      - INDEX_CONTAINER=index
+      - INDEX_DIR=/app/data/index
+      - MOCK_INDEX_DIR=/app/data/mock_index
+      - FORCE_DOWNLOAD=false
+      - PRODUCTION_STORAGE_CONNECTION_STRING=${PRODUCTION_STORAGE_CONNECTION_STRING}
+      - DEVELOPMENT_STORAGE_CONNECTION_STRING=${DEVELOPMENT_STORAGE_CONNECTION_STRING}
+    volumes:
+      - vector-db-data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - backend
+
+  inferenceapi:
+    container_name: inference-api
+    image: ${DOCKER_REGISTRY}-inferenceapi
+    links:
+      - redis
+      - cosmos-db-emulator
+    depends_on:
+      - redis
+      - cosmos-db-emulator
+      - vector-db-api
+    build:
+      context: ../microservices/spred.api.inference/source
+      dockerfile: InferenceService/Dockerfile
+      target: development
+      args:
+      - FEED_ACCESSTOKEN=${FEED_ACCESSTOKEN}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - MODEL_VERSION="v1.0.0"
+    networks:
+      - backend
+    environment:
+      - KeyVaultConnectionString=null
+      - ManagedIdentity=null
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+
+  aggregatorapi:
+    container_name: aggregator-api
+    image: ${DOCKER_REGISTRY}-aggregatorapi
+    links:
+      - rabbitmq
+    depends_on:
+      - rabbitmq
+    build:
+      context: ../microservices/spred.api.aggregator/source
+      dockerfile: AggregatorService/Dockerfile
+      target: development
+      args:
+      - FEED_ACCESSTOKEN=${FEED_ACCESSTOKEN}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+    networks:
+      - backend
+    environment:
+      - KeyVaultConnectionString=null
+      - ManagedIdentity=null
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+  
+  submissionapi:
+    container_name: submission-api
+    image: ${DOCKER_REGISTRY}-submissionapi
+    links:
+      - rabbitmq
+    depends_on:
+      - rabbitmq
+    build:
+      context: ../microservices/spred.api.submission/source
+      dockerfile: SubmissionService/Dockerfile
+      target: development
+      args:
+      - FEED_ACCESSTOKEN=${FEED_ACCESSTOKEN}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+    networks:
+      - backend
+    environment:
+      - KeyVaultConnectionString=null
+      - ManagedIdentity=null
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+
+  subscriptionapi:
+    container_name: subscription-api
+    image: ${DOCKER_REGISTRY}-subscriptionapi
+    links:
+      - rabbitmq
+    depends_on:
+      - rabbitmq
+    build:
+      context: ../microservices/spred.api.subscription/source
+      dockerfile: SubscriptionService/Dockerfile
+      target: development
+      args:
+      - FEED_ACCESSTOKEN=${FEED_ACCESSTOKEN}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+    networks:
+      - backend
+    environment:
+      - KeyVaultConnectionString=null
+      - ManagedIdentity=null
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+  
+  activityapi:
+    container_name: activity-api
+    image: ${DOCKER_REGISTRY}-activityapi
+    links:
+      - rabbitmq
+    depends_on:
+      - rabbitmq
+    build:
+      context: ../microservices/spred.api.activity/source
+      dockerfile: ActivityService/Dockerfile
+      target: development
+      args:
+      - FEED_ACCESSTOKEN=${FEED_ACCESSTOKEN}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+    networks:
+      - backend
+    environment:
+      - KeyVaultConnectionString=null
+      - ManagedIdentity=null
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+
+  cosmos-db-emulator:
+    container_name: cosmos-db-emulator
+    image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:latest
+    hostname: azurecosmosemulator
+    tty: true
+    restart: always
+    mem_limit: 6G
+    cpu_count: 2
+    environment:
+      - AZURE_COSMOS_EMULATOR_PARTITION_COUNT=30
+      - AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE=true
+    ports:
+      - "8081:8081"
+    volumes:
+      - vol_cosmos:/data/db
+    networks:
+      backend:
+        aliases:
+          - "azurecosmosemulator.domain"
+
+  rabbitmq:
+    image: rabbitmq:management-alpine
+    container_name: 'rabbitmq'
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    networks:
+      - backend
+    
+  redis:
+    image: redis/redis-stack:latest
+    container_name: redis
+    restart: always
+    environment:
+      - REDIS_PASSWORD=eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - backend
+
+  # userinterface:
+  #   container_name: user-interface
+  #   image: ${DOCKER_REGISTRY}-userinterface
+  #   build:
+  #     context: ../microservices/spred.ui/ReactUI/SpredUI
+  #     dockerfile: Dockerfile
+  #     target: development
+  #   networks:
+  #      - frontend
+  #   environment:
+  #      - NODE_ENV=${ASPNETCORE_ENVIRONMENT}
+
+volumes:
+  redis_data:
+  vol_cosmos:
+  vector-db-data:
+

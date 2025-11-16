@@ -1,0 +1,30 @@
+[submodule "microservices/spred.api.authorazation"]
+	path = microservices/spred.api.authorazation
+	url = https://SpredDeveloperGroup@dev.azure.com/SpredDeveloperGroup/Spred/_git/spred.api.authorazation
+[submodule "microservices/spred.api.playlist"]
+	path = microservices/spred.api.playlist
+	url = https://SpredDeveloperGroup@dev.azure.com/SpredDeveloperGroup/Spred/_git/spred.api.playlist
+[submodule "microservices/spred.api.track"]
+	path = microservices/spred.api.track
+	url = https://SpredDeveloperGroup@dev.azure.com/SpredDeveloperGroup/Spred/_git/spred.api.track
+[submodule "microservices/spred.ui"]
+	path = microservices/spred.ui
+	url = https://SpredDeveloperGroup@dev.azure.com/SpredDeveloperGroup/Spred/_git/spred.ui
+[submodule "microservices/spred.api.inference"]
+	path = microservices/spred.api.inference
+	url = https://SpredDeveloperGroup@dev.azure.com/SpredDeveloperGroup/Spred/_git/spred.api.inference
+[submodule "microservices/spred.api.vector-db"]
+	path = microservices/spred.api.vector-db
+	url = https://spreddevelopergroup.visualstudio.com/Spred/_git/spred.api.vector-db
+[submodule "microservices/spred.api.aggregator"]
+	path = microservices/spred.api.aggregator
+	url = https://SpredDeveloperGroup@dev.azure.com/SpredDeveloperGroup/Spred/_git/spred.api.aggregator
+[submodule "microservices/spred.api.submission"]
+	path = microservices/spred.api.submission
+	url = https://SpredDeveloperGroup@dev.azure.com/SpredDeveloperGroup/Spred/_git/spred.api.submission
+[submodule "microservices/spred.api.activity"]
+	path = microservices/spred.api.activity
+	url = https://SpredDeveloperGroup@dev.azure.com/SpredDeveloperGroup/Spred/_git/spred.api.activity
+[submodule "microservices/spred.api.embedder"]
+	path = microservices/spred.api.embedder
+	url = https://SpredDeveloperGroup@dev.azure.com/SpredDeveloperGroup/Spred/_git/spred.api.embedder

@@ -1,0 +1,40 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: aggregator-service-ingress-v2-secure
+  annotations:
+    cert-manager.io/cluster-issuer: production
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+spec:
+  ingressClassName: external-nginx
+  rules:
+    - host: api.spred.io
+      http:
+        paths:
+          - path: /aggregator
+            pathType: Prefix
+            backend:
+              service:
+                name: aggregator-service
+                port:
+                  number: 8080
+  tls:
+    - hosts:
+        - api.spred.io
+      secretName: api-spred-io
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aggregator-service-lb
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: aggregator-service

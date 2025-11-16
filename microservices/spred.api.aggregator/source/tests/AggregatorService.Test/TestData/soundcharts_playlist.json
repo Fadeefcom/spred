@@ -1,0 +1,23 @@
+{
+  "type": "playlist",
+  "object": {
+    "uuid": "942c8caf-d2d6-41fc-b7c8-432af5c3a404",
+    "name": "ABBA - Voyage",
+    "identifier": "6K4odNOEdEFIFNUvnNem5e",
+    "platform": "spotify",
+    "countryCode": "RO",
+    "owner": {
+      "name": "uDiscover Romania",
+      "identifier": "getmusicro"
+    },
+    "latestCrawlDate": "2025-10-06T05:10:01+00:00",
+    "latestTrackCount": 91,
+    "latestSubscriberCount": 590,
+    "type": "Curators & Listeners",
+    "refreshed": "daily",
+    "availableCountryCodes": [],
+    "appUrl": "https://app.soundcharts.com/app/playlist/942c8caf-d2d6-41fc-b7c8-432af5c3a404",
+    "imageUrl": "https://i.scdn.co/image/ab67706c0000bebb25846a55e1196a99ed11606a"
+  },
+  "errors": []
+}

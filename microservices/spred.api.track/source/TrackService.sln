@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrackService", "TrackService\TrackService.csproj", "{3D4A7CAF-E3C3-400F-ACBF-65FC7B67C78C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{E4553D03-DA68-438F-A55C-0815BF4D4502}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackService.Test", "tests\TrackService.Test\TrackService.Test.csproj", "{E63B1ACC-BD9C-4FCF-A3A1-706C8C9C2787}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3D4A7CAF-E3C3-400F-ACBF-65FC7B67C78C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D4A7CAF-E3C3-400F-ACBF-65FC7B67C78C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D4A7CAF-E3C3-400F-ACBF-65FC7B67C78C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D4A7CAF-E3C3-400F-ACBF-65FC7B67C78C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E63B1ACC-BD9C-4FCF-A3A1-706C8C9C2787}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E63B1ACC-BD9C-4FCF-A3A1-706C8C9C2787}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E63B1ACC-BD9C-4FCF-A3A1-706C8C9C2787}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E63B1ACC-BD9C-4FCF-A3A1-706C8C9C2787}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F4CEB1AA-CC4A-438E-903E-D684BF0748CC}
+	EndGlobalSection
+	GlobalSection(RiderSharedRunConfigurations) = postSolution
+		File = TrackService\Properties\TrackService_Dockerfile.run.xml
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E63B1ACC-BD9C-4FCF-A3A1-706C8C9C2787} = {E4553D03-DA68-438F-A55C-0815BF4D4502}
+	EndGlobalSection
+EndGlobal

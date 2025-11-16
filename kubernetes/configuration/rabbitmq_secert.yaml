@@ -1,0 +1,25 @@
+apiVersion: secrets-store.csi.x-k8s.io/v1
+kind: SecretProviderClass
+metadata:
+  name: azure-kvprovider-rabbitmq
+spec:
+  provider: azure
+  parameters:
+    usePodIdentity: "false"
+    useVMManagedIdentity: "true"
+    userAssignedIdentityID: #{client-id}#
+    keyvaultName: #{key-vault-name}#
+    cloudName: ""
+    objects: |
+      array:
+        - |
+          objectName: erlang-cookie
+          objectType: secret
+          objectVersion: ""
+    tenantId: #{tenant-id}#
+  secretObjects:
+    - data:
+        - key: erlang-cookie
+          objectName: erlang-cookie
+      secretName: erlang-cookie
+      type: Opaque

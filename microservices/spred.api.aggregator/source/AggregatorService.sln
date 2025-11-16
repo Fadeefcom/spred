@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AggregatorService", "AggregatorService\AggregatorService.csproj", "{97EBC21F-89DD-4530-9449-A3E9F32B5D38}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{8EE881CB-99F1-4FD9-8887-FB99BC91300D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AggregatorService.Test", "tests\AggregatorService.Test\AggregatorService.Test.csproj", "{F8A6758B-C202-406F-98ED-EA8B5C655936}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{97EBC21F-89DD-4530-9449-A3E9F32B5D38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97EBC21F-89DD-4530-9449-A3E9F32B5D38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97EBC21F-89DD-4530-9449-A3E9F32B5D38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97EBC21F-89DD-4530-9449-A3E9F32B5D38}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8A6758B-C202-406F-98ED-EA8B5C655936}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8A6758B-C202-406F-98ED-EA8B5C655936}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8A6758B-C202-406F-98ED-EA8B5C655936}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8A6758B-C202-406F-98ED-EA8B5C655936}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F8A6758B-C202-406F-98ED-EA8B5C655936} = {8EE881CB-99F1-4FD9-8887-FB99BC91300D}
+	EndGlobalSection
+EndGlobal

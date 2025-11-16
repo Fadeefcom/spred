@@ -1,0 +1,15 @@
+﻿.idea
+.vs
+**/bin/
+**/obj/
+**/.idea/
+**/.vs/
+source/Recommendation/AudioFiles
+source/Recommendation/Ffmpeg
+source/Tests/BenchmarkTests/AudioFiles
+source/AggregatorService/AudioFiles
+source/AggregatorService/saved_data
+source/AggregatorService/VideoFiles
+source/AggregatorService/Ffmpeg
+source/AggregatorService.sln.DotSettings.user
+source/tests/coverage

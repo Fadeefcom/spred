@@ -1,0 +1,105 @@
+﻿# Docker
+# Build and push an image to Azure Container Registry
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+trigger:
+- main
+      
+resources:
+- repo: self
+
+variables:
+- group: 'Spred-pieplines'
+- name: "imageRepo"
+  value: 'subscription'
+- name: "dockerfile"
+  value: 'source/SubscriptionService/Dockerfile'
+- name: "tag"
+  value: '$(Build.BuildId)'
+- name: "environment"
+  value: Production
+
+stages:
+- stage: Build
+  displayName: Build and push stage
+  jobs:
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: $(vmImageType)
+      name: $(vmImageName)
+    steps:
+    - task: DockerInstaller@0
+      inputs:
+        dockerVersion: '28.1.1'
+    - task: Docker@2
+      inputs:
+        command: 'build'
+        Dockerfile: '$(Pipeline.Workspace)/s/$(dockerfile)'
+        buildContext: '$(Pipeline.Workspace)/s/source'
+        tags: '$(tag)'
+        repository: '$(containerRegistry)/$(imageRepo)'
+        arguments: '--target production --build-arg FEED_ACCESSTOKEN=$(accessToken) --build-arg ASPNETCORE_ENVIRONMENT=$(environment)'
+      env:
+        FEED_ACCESSTOKEN: $(accessToken)
+        ASPNETCORE_ENVIRONMENT: $(environment)
+    - task: Docker@2
+      displayName: Push docker container
+      inputs:
+        containerRegistry: '$(docker-registry-connection)'
+        repository: '$(imageRepo)'
+        command: 'push'
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: '$(Pipeline.Workspace)/s/manifests'
+        artifact: 'manifests'
+        publishLocation: 'pipeline'
+
+- stage: Deploy
+  displayName: Deploy to Dev
+  dependsOn: Build
+  variables:
+    container-registry: '$(containerRegistry)/$(imageRepo):$(tag)'
+  jobs:
+  - deployment: Deploy
+    displayName: Deploy to AKS
+    environment: 'Azure subscription'
+    pool: 
+      vmImage: $(vmImageType)
+      name: $(vmImageName)
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: DownloadPipelineArtifact@2
+            inputs:
+              buildType: 'current'
+              artifactName: 'manifests'
+              targetPath: '$(Pipeline.Workspace)/a/manifests'
+          - task: replacetokens@6
+            displayName: Replace Tokens
+            inputs:
+              rootDirectory: '$(Pipeline.Workspace)/a/manifests'
+              targetFiles: 'deployment.yaml'
+              encoding: 'auto'
+              writeBOM: true
+              actionOnMissing: 'warn'
+              enableTransforms: false
+              enableRecursion: false
+          - task: KubernetesManifest@1
+            inputs:
+              action: 'deploy'
+              namespace: 'default'
+              manifests: $(Pipeline.Workspace)/a/manifests/deployment.yaml
+              containers: '$(containerRegistry)/$(imageRepo):$(tag)'
+              connectionType: 'kubernetesServiceConnection'
+              kubernetesServiceConnection: '$(k8s-connection)'
+          - task: KubernetesManifest@1
+            inputs:
+              action: 'deploy'
+              namespace: 'default'
+              manifests: |
+                        $(Pipeline.Workspace)/a/manifests/service.yaml
+                        $(Pipeline.Workspace)/a/manifests/ingress.yaml
+              connectionType: 'kubernetesServiceConnection'
+              kubernetesServiceConnection: '$(k8s-connection)'

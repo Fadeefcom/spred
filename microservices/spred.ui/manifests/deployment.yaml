@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-interface
+  labels:
+    app: user-interface
+    evironment: prod
+    tier: frontend
+spec:
+  replicas: #{replicaNo}#
+  selector:
+    matchLabels:
+      app: user-interface
+  template:
+    metadata:
+      labels:
+        app: user-interface
+        evironment: prod
+        tier: frontend
+    spec:
+      nodeSelector:
+        agentpool: generalp01
+        kubernetes.io/os: linux
+      containers:
+        - name: user-interface
+          image: #{container-registry}#
+          ports:
+            - containerPort: 443
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
+          readinessProbe:
+            httpGet:
+              path: /healthz.html
+              port: 443
+              scheme: HTTP
+            initialDelaySeconds: 3
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 2
+      imagePullSecrets:
+        - name: acr-secret

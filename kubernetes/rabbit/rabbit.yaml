@@ -1,0 +1,239 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: rabbitmq
+---
+# apiVersion: v1
+# kind: Secret
+# metadata:
+#   name: erlang-cookie
+#   namespace: rabbitmq
+# type: Opaque
+# data:
+#   cookie: #{erlangCookie}#
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: rabbitmq-admin
+  namespace: rabbitmq
+type: Opaque
+data:
+  user: #{rabbitmqUser}#
+  pass: #{rabbitmqPass}#
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rabbitmq-config
+  namespace: rabbitmq
+data:
+  rabbitmq.conf: |
+    loopback_users = none
+    default_user = #{rabbitmqUser}#
+    default_pass = #{rabbitmqPass}#
+    management.listener.port = 15672
+    prometheus.tcp.port = 15692
+    cluster_formation.peer_discovery_backend = rabbit_peer_discovery_k8s
+    cluster_formation.k8s.host = kubernetes.default.svc.cluster.local
+    cluster_formation.k8s.address_type = hostname
+    cluster_formation.k8s.service_name = rabbitmq-headless
+    cluster_partition_handling = pause_minority
+  enabled_plugins: |
+    [rabbitmq_management, rabbitmq_prometheus, rabbitmq_peer_discovery_k8s, rabbitmq_shovel, rabbitmq_shovel_management].
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq-headless
+  namespace: rabbitmq
+spec:
+  clusterIP: None
+  selector:
+    app: rabbitmq
+  ports:
+    - port: 4369
+      name: epmd
+    - port: 25672
+      name: clustering
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq-client
+  namespace: rabbitmq
+spec:
+  type: ClusterIP
+  selector:
+    app: rabbitmq
+  ports:
+    - port: 5672
+      targetPort: 5672
+      name: amqp
+    - port: 15672
+      targetPort: 15672
+      name: management
+    - port: 15692
+      targetPort: 15692
+      name: prometheus
+---
+
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   annotations:
+#     pv.kubernetes.io/provisioned-by: managed-csi
+#   name: rabbitmq-pv
+#   namespace: rabbitmq
+# spec:
+#   capacity:
+#     storage: 30Gi
+#   accessModes:
+#     - ReadWriteOnce
+#   persistentVolumeReclaimPolicy: Retain
+#   storageClassName: managed-csi
+#   # azureFile:
+#   #   secretName: azure-secret
+#   #   sharedName: eventstore-share
+#   #   readOnly: false
+#   csi:
+#     driver: disk.csi.azure.com
+#     volumeHandle: #{dickConnectionString}#
+#     volumeAttributes:
+#       fsType: ext4
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rabbitmq-pvc
+  namespace: rabbitmq
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: managed-csi
+  resources:
+    requests:
+      storage: 15Gi
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rabbitmq
+  namespace: rabbitmq
+spec:
+  serviceName: rabbitmq-headless
+  replicas: #{replicas}#
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      securityContext:
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
+      containers:
+        - name: rabbitmq
+          image: #{rabbitmqImage}#
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "500m"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"
+          env:
+            - name: RABBITMQ_DEFAULT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-admin
+                  key: user
+            - name: RABBITMQ_DEFAULT_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-admin
+                  key: pass
+            - name: RABBITMQ_ERLANG_COOKIE
+              valueFrom:
+                secretKeyRef:
+                  name: erlang-cookie
+                  key: erlang-cookie
+          ports:
+            - containerPort: 5672
+            - containerPort: 15672
+            - containerPort: 15692
+            - containerPort: 4369
+            - containerPort: 25672
+          livenessProbe:
+            exec:
+              command: ["rabbitmq-diagnostics", "status"]
+            initialDelaySeconds: 60
+            periodSeconds: 60
+            timeoutSeconds: 15
+          readinessProbe:
+            exec:
+              command: ["rabbitmq-diagnostics", "ping"]
+            initialDelaySeconds: 20
+            periodSeconds: 60
+            timeoutSeconds: 10
+          volumeMounts:
+            - name: rabbitmq-data
+              mountPath: /var/lib/rabbitmq/mnesia
+            - name: rabbitmq-config
+              mountPath: /etc/rabbitmq
+            - name: erlang-cookie
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
+      imagePullSecrets:
+        - name: acr-secret
+      volumes:
+        - name: rabbitmq-data
+          persistentVolumeClaim:
+            claimName: rabbitmq-pvc
+        - name: rabbitmq-config
+          configMap:
+            name: rabbitmq-config
+        - name: erlang-cookie
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "azure-kvprovider-rabbitmq"
+---
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: rabbitmq-ingress
+#   namespace: rabbitmq
+#   annotations:
+#     cert-manager.io/cluster-issuer: production
+#     nginx.ingress.kubernetes.io/ssl-redirect: "true"
+#     nginx.ingress.kubernetes.io/hsts: "true"
+#     nginx.ingress.kubernetes.io/hsts-max-age: "31536000"
+#     nginx.ingress.kubernetes.io/hsts-include-subdomains: "true"
+#     nginx.ingress.kubernetes.io/x-frame-options: "DENY"
+#     nginx.ingress.kubernetes.io/x-content-type-options: "nosniff"
+#     nginx.ingress.kubernetes.io/referrer-policy: "strict-origin-when-cross-origin"
+#     nginx.ingress.kubernetes.io/limit-rps: "5"
+#     nginx.ingress.kubernetes.io/auth-url: "http://auth-service.default.svc.cluster.local:8080/mgmt/validate"
+#     nginx.ingress.kubernetes.io/auth-signin: "https://api.spred.io/mgmt/login?return=$request_uri"
+# spec:
+#   ingressClassName: external-nginx
+#   rules:
+#     - host: rabbitmq.spred.io
+#       http:
+#         paths:
+#           - path: /
+#             pathType: Prefix
+#             backend:
+#               service:
+#                 name: rabbitmq-client
+#                 port:
+#                   number: 15672
+#   tls:
+#     - hosts:
+#         - rabbitmq.spred.io
+#       secretName: rabbitmq-spred-io

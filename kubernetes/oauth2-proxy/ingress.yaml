@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: production
+    nginx.ingress.kubernetes.io/proxy-body-size: "2000m"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "32k"
+  name: oauth2-proxy-ingress
+spec:
+  ingressClassName: external-nginx
+  tls:
+    - hosts:
+        - api.spred.io
+      secretName: api-spred-com
+  rules:
+    - host: api.spred.io
+      http:
+        paths:
+          - path: /oauth2
+            pathType: Prefix
+            backend:
+              service:
+                name: oauth2-proxy-svc
+                port:
+                  number: 4180

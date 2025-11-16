@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+    
+    <PropertyGroup>
+        <AnalysisMode>Recommended</AnalysisMode>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>7617b20c-2917-4430-b7ab-49f452fd593d</UserSecretsId>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <DockerfileContext>.</DockerfileContext>
+        <GenerateRuntimeConfigurationFiles>True</GenerateRuntimeConfigurationFiles>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <TargetFrameworkVersion>9.0.5</TargetFrameworkVersion>
+        <AnalysisLevel>latest</AnalysisLevel>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="AutoMapper" Version="14.0.0" />
+      <PackageReference Include="Extensions" Version="1.5.11" />
+      <PackageReference Include="MediatR" Version="13.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="9.0.8" />
+      <PackageReference Include="Refit" Version="8.0.0" />
+      <PackageReference Include="Refit.HttpClientFactory" Version="8.0.0" />
+      <PackageReference Include="Repository.Abstractions" Version="1.5.14" />
+      <PackageReference Include="Spred.Bus" Version="0.0.58" />
+      <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="8.0.0" />
+      <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="8.0.0" />
+      <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="8.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Components\Consumers\" />
+      <Folder Include="Helpers\" />
+    </ItemGroup>
+
+    <PropertyGroup>
+        <WarningsAsErrors>$(WarningsNotAsErrors)</WarningsAsErrors>
+    </PropertyGroup>
+
+</Project>

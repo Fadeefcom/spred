@@ -1,0 +1,9 @@
+﻿node_modules
+build
+.dockerignore
+.vs
+.idea
+.obj
+.vscode
+Dockerfile
+Dockerfile.prod

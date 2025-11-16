@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: eventstore-cluster
+spec:
+  selector:
+    matchLabels:
+      app: eventstore-cluster 
+  serviceName: eventstore-cluster
+  replicas: #{replicaNo}#  #Needs to match EVENTSTORE_CLUSTER_SIZE
+  template:
+    metadata:
+      labels:
+        app: eventstore-cluster
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                    - eventstore-cluster
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+      - name: eventstore
+        image: #{container-registry}#
+        resources:
+          requests:
+            cpu: 500m
+            memory: 2Gi
+        env:
+        - name: EVENTSTORE_INSECURE
+          value: "true"
+        - name: EVENTSTORE_ENABLE_ATOM_PUB_OVER_HTTP
+          value: "true"
+        - name: EVENTSTORE_CLUSTER_SIZE
+          value: "1"    #Needs to match replicas
+        - name: EVENTSTORE_DISCOVER_VIA_DNS
+          value: "true"
+        - name: EVENTSTORE_CLUSTER_DNS
+          value: "eventstore-cluster" #Will match our service name
+        # - name: EVENTSTORE_EXT_IP
+        #   valueFrom:
+        #     fieldRef:
+        #       fieldPath: status.podIP
+        ports:
+        - containerPort: 2113
+          name: eventstore-web
+        - containerPort: 1113
+          name: eventstore-tcp
+        - containerPort: 2112
+        volumeMounts:
+          - mountPath: /var/lib/eventstore
+            name: eventstore-data
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 2113
+          initialDelaySeconds: 30
+          periodSeconds: 15
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 2113
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      securityContext:
+        fsGroup: 1000      
+      volumes:
+      - name: eventstore-data
+        persistentVolumeClaim:
+          claimName: eventstore-pvc

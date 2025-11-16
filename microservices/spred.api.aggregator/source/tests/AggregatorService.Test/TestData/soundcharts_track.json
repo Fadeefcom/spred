@@ -1,0 +1,92 @@
+{
+  "type": "song",
+  "object": {
+    "uuid": "fe35c674-ee4a-4ae7-8881-e6906357e311",
+    "name": "ʎɐʍqns",
+    "isrc": {
+      "value": "RO2DY2500833",
+      "countryCode": "RO",
+      "countryName": "Romania"
+    },
+    "creditName": "xanbiental & ฅ^>⩊<^ ฅ meow & ≽^•⩊•^≼ rawr & r00mz",
+    "artists": [
+      {
+        "uuid": "9a6bd792-85b3-473d-ab5b-4e4c85973e47",
+        "slug": "xanbiental",
+        "name": "xanbiental",
+        "appUrl": "https://app.soundcharts.com/app/artist/xanbiental/overview",
+        "imageUrl": "https://assets.soundcharts.com/artist/3/b/5/9a6bd792-85b3-473d-ab5b-4e4c85973e47.jpg"
+      },
+      {
+        "uuid": "3c73e080-dbc9-4da8-ae47-b65a23b0eaa3",
+        "slug": "k-h-k-h-meow",
+        "name": "ฅ^>⩊<^ ฅ meow",
+        "appUrl": "https://app.soundcharts.com/app/artist/k-h-k-h-meow/overview",
+        "imageUrl": "https://assets.soundcharts.com/artist/9/c/b/3c73e080-dbc9-4da8-ae47-b65a23b0eaa3.jpg"
+      },
+      {
+        "uuid": "42a5b240-0d28-4b93-9d6e-98e62e0c0cd9",
+        "slug": "o-o-rawr",
+        "name": "≽^•⩊•^≼ rawr",
+        "appUrl": "https://app.soundcharts.com/app/artist/o-o-rawr/overview",
+        "imageUrl": "https://assets.soundcharts.com/artist/8/2/d/42a5b240-0d28-4b93-9d6e-98e62e0c0cd9.jpg"
+      },
+      {
+        "uuid": "27ecee98-bb5a-423c-813e-f99f129bbcff",
+        "slug": "r00mz",
+        "name": "r00mz",
+        "appUrl": "https://app.soundcharts.com/app/artist/r00mz/overview",
+        "imageUrl": "https://assets.soundcharts.com/artist/a/5/b/27ecee98-bb5a-423c-813e-f99f129bbcff.jpg"
+      }
+    ],
+    "releaseDate": "2025-09-15T00:00:00+00:00",
+    "copyright": "℗ 2025 GROTERIC",
+    "appUrl": "https://app.soundcharts.com/app/song/fe35c674-ee4a-4ae7-8881-e6906357e311/overview",
+    "imageUrl": "https://assets.soundcharts.com/song/a/4/e/fe35c674-ee4a-4ae7-8881-e6906357e311.jpg",
+    "duration": 0,
+    "explicit": false,
+    "genres": [
+      {
+        "root": "electronic",
+        "sub": [
+          "electronic"
+        ]
+      },
+      {
+        "root": "techno",
+        "sub": [
+          "dance"
+        ]
+      }
+    ],
+    "composers": [
+      "Robert Bezdedan"
+    ],
+    "producers": [
+      "Robert Bezdedan"
+    ],
+    "labels": [
+      {
+        "name": "GROTERIC",
+        "type": "unknown"
+      }
+    ],
+    "audio": {
+      "acousticness": 0.75,
+      "danceability": 0.47,
+      "energy": 0.49,
+      "instrumentalness": 0.9,
+      "key": 11,
+      "liveness": 0.11,
+      "loudness": -12.4,
+      "mode": 0,
+      "speechiness": 0.03,
+      "tempo": 81,
+      "timeSignature": 4,
+      "valence": 0.16
+    },
+    "languageCode": "",
+    "distributor": "Universal"
+  },
+  "errors": []
+}

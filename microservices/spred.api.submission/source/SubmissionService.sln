@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SubmissionService", "SubmissionService\SubmissionService.csproj", "{AF589EE4-734E-4AA1-A7AC-23BBE05F892E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SubmissionService.Test", "tests\SubmissionService.Test\SubmissionService.Test.csproj", "{593B712F-1F62-4A94-8BF8-CCD545FDCECC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{26143A95-7948-474E-8429-69289543CD73}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AF589EE4-734E-4AA1-A7AC-23BBE05F892E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF589EE4-734E-4AA1-A7AC-23BBE05F892E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF589EE4-734E-4AA1-A7AC-23BBE05F892E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF589EE4-734E-4AA1-A7AC-23BBE05F892E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{593B712F-1F62-4A94-8BF8-CCD545FDCECC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{593B712F-1F62-4A94-8BF8-CCD545FDCECC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{593B712F-1F62-4A94-8BF8-CCD545FDCECC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{593B712F-1F62-4A94-8BF8-CCD545FDCECC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{593B712F-1F62-4A94-8BF8-CCD545FDCECC} = {26143A95-7948-474E-8429-69289543CD73}
+	EndGlobalSection
+EndGlobal

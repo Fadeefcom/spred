@@ -1,0 +1,67 @@
+﻿---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: subscription-service-ingress-v2-secure
+  annotations:
+    cert-manager.io/cluster-issuer: production
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/limit-rps: "10"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://spred.io"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, PUT, POST, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "Authorization,Content-Type,X-Requested-With,Accept,Origin,Referer,x-client-deviceid,User-Agent"
+    nginx.ingress.kubernetes.io/cors-expose-headers: "Content-Length,Content-Range"
+    nginx.ingress.kubernetes.io/cors-max-age: "86400"
+    nginx.ingress.kubernetes.io/hsts: "true"
+    nginx.ingress.kubernetes.io/hsts-max-age: "31536000"
+    nginx.ingress.kubernetes.io/hsts-include-subdomains: "true"
+    nginx.ingress.kubernetes.io/x-frame-options: "DENY"
+    nginx.ingress.kubernetes.io/x-content-type-options: "nosniff"
+    nginx.ingress.kubernetes.io/referrer-policy: "strict-origin-when-cross-origin"
+spec:
+  ingressClassName: external-nginx
+  rules:
+    - host: api.spred.io
+      http:
+        paths:
+          - path: /subscription
+            pathType: Prefix
+            backend:
+              service:
+                name: subscription-service
+                port:
+                  number: 8080
+  tls:
+    - hosts:
+        - api.spred.io
+      secretName: api-spred-io
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: subscription-webhook-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: production
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/limit-rps: "5"
+    nginx.ingress.kubernetes.io/proxy-body-size: "2m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "30"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "30"
+    # nginx.ingress.kubernetes.io/whitelist-source-range: "<PUT_STRIPE_CIDR_LIST_HERE>"
+spec:
+  ingressClassName: external-nginx
+  rules:
+    - host: api.spred.io
+      http:
+        paths:
+          - path: /internal/stripe/webhook
+            pathType: Exact
+            backend:
+              service:
+                name: subscription-service
+                port:
+                  number: 8080
+  tls:
+    - hosts: [api.spred.io]
+      secretName: api-spred-io

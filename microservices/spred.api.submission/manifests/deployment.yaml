@@ -1,0 +1,54 @@
+﻿apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: submission-service
+  labels:
+    app: submission-service
+    environment: prod
+    tier: backend
+spec:
+  replicas: #{replicaNo}#
+  selector:
+    matchLabels:
+      app: submission-service
+  template:
+    metadata:
+      labels:
+        app: submission-service
+        environment: prod
+        tier: backend
+    spec:
+      nodeSelector:
+        agentpool: generalp01
+        kubernetes.io/os: linux
+      containers:
+      - name: submission-service
+        image: #{container-registry}#
+        ports:
+          - containerPort: 8080
+        volumeMounts:
+          - name: secrets-store01-inline
+            mountPath: "/mnt/secrets-store"
+            readOnly: true
+        env:
+        - name: KeyVaultConnectionString
+          valueFrom:
+            secretKeyRef:
+              name: app-configuration-cnct-str
+              key: appconfiguration
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits:
+            cpu: 200m
+            memory: 400Mi
+      imagePullSecrets:
+        - name: acr-secret
+      volumes:
+        - name: secrets-store01-inline
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "azure-kvprovider-user-msi"

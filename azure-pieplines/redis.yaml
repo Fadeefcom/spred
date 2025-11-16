@@ -1,0 +1,65 @@
+trigger: none
+
+variables:
+- group: 'Spred-pieplines'
+
+stages:
+  - stage: Push
+    displayName: Push artifacts
+    jobs:
+      - job: Push
+        displayName: Push redis manifests
+        pool:
+          vmImage: $(vmImageType)
+          name: $(vmImageName)
+        steps:
+          - task: PublishPipelineArtifact@1
+            displayName: Publish redis manifests
+            inputs:
+              targetPath: '$(Pipeline.Workspace)/s/kubernetes/redis'
+              artifact: 'manifests'
+              publishLocation: 'pipeline'
+
+  - stage: Deploy
+    displayName: Deploy Redis to dev
+    dependsOn: Push
+    jobs:
+      - deployment: Deploy
+        displayName: Deploy Redis to AKS
+        environment: 'Azure subscription'
+        variables:
+          redisImage: 'redis:7.2.11-alpine'
+        pool:
+          vmImage: $(vmImageType)
+          name: $(vmImageName)
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: DownloadPipelineArtifact@2
+                  displayName: Download redis manifests
+                  inputs:
+                    buildType: 'current'
+                    artifactName: 'manifests'
+                    targetPath: '$(Pipeline.Workspace)/manifests'
+
+                - task: replacetokens@6
+                  displayName: Replace Tokens
+                  inputs:
+                    rootDirectory: '$(Pipeline.Workspace)/manifests/redis'
+                    targetFiles: 'redis.yaml'
+                    encoding: 'auto'
+                    writeBOM: true
+                    actionOnMissing: 'warn'
+                    enableTransforms: false
+                    enableRecursion: false
+
+                - task: KubernetesManifest@1
+                  displayName: Apply redis.yaml
+                  inputs:
+                    action: 'deploy'
+                    namespace: 'redis'
+                    manifests: '$(Pipeline.Workspace)/manifests/redis/redis.yaml'
+                    connectionType: 'kubernetesServiceConnection'
+                    containers: '$(redisImage)'
+                    kubernetesServiceConnection: '$(k8s-connection)'

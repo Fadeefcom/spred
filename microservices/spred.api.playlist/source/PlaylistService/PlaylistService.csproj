@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <AnalysisMode>Recommended</AnalysisMode>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <InvariantGlobalization>false</InvariantGlobalization>
+        <PackageTags>Service</PackageTags>
+        <Description>Playlist service, handles playlists operations.</Description>
+        <UserSecretsId>007f2d69-b02f-40f2-a655-443b178a0e96</UserSecretsId>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <DockerfileContext>.</DockerfileContext>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <TargetFrameworkVersion>9.0.5</TargetFrameworkVersion>
+        <AnalysisLevel>latest</AnalysisLevel>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="AutoMapper" Version="14.0.0" />
+        <PackageReference Include="Extensions" Version="1.5.18" />
+        <PackageReference Include="MassTransit.RabbitMQ" Version="8.4.1" />
+        <PackageReference Include="MediatR" Version="12.4.1" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.3" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.AzureAppConfiguration" Version="8.1.1" />
+        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.2" />
+        <PackageReference Include="Refit" Version="8.0.0" />
+        <PackageReference Include="Repository.Abstractions" Version="1.5.16" />
+        <PackageReference Include="Spred.Bus" Version="0.0.72" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="8.0.0" />
+    </ItemGroup>
+
+    <PropertyGroup>
+        <CopyOutputSymbolsToPublishDirectory>true</CopyOutputSymbolsToPublishDirectory>
+        <CopyOutputBindingsToPublishDirectory>true</CopyOutputBindingsToPublishDirectory>
+        <PreserveCompilationContext>true</PreserveCompilationContext>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+            <_Parameter1>PlaylistService.Test</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+
+    <PropertyGroup>
+        <WarningsAsErrors>$(WarningsNotAsErrors)</WarningsAsErrors>
+    </PropertyGroup>
+
+</Project>

@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+    
+    <PropertyGroup>
+        <AnalysisMode>Recommended</AnalysisMode>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>7617b20c-2917-4430-b7ab-49f452fd593d</UserSecretsId>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <DockerfileContext>.</DockerfileContext>
+        <GenerateRuntimeConfigurationFiles>True</GenerateRuntimeConfigurationFiles>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <TargetFrameworkVersion>9.0.5</TargetFrameworkVersion>
+        <AnalysisLevel>latest</AnalysisLevel>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Extensions" Version="1.5.8" />
+      <PackageReference Include="Repository.Abstractions" Version="1.5.10" />
+      <PackageReference Include="Spred.Bus" Version="0.0.50" />
+      <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="8.0.0" />
+      <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="8.0.0" />
+      <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="8.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Abstractions\" />
+      <Folder Include="Components\Consumers\" />
+      <Folder Include="Components\Handlers\" />
+      <Folder Include="Components\Services\" />
+      <Folder Include="Configurations\" />
+      <Folder Include="DependencyExtensions\" />
+      <Folder Include="Helpers\" />
+      <Folder Include="Models\" />
+    </ItemGroup>
+
+    <PropertyGroup>
+        <WarningsAsErrors>$(WarningsNotAsErrors)</WarningsAsErrors>
+    </PropertyGroup>
+
+</Project>

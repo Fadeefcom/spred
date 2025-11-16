@@ -1,0 +1,35 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: user-interface-ingress-v2-secure
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: production
+    nginx.ingress.kubernetes.io/x-frame-options: "DENY"
+    nginx.ingress.kubernetes.io/x-content-type-options: "nosniff"
+    nginx.ingress.kubernetes.io/referrer-policy: "strict-origin-when-cross-origin"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/hsts: "true"
+    nginx.ingress.kubernetes.io/hsts-max-age: "31536000"
+    nginx.ingress.kubernetes.io/hsts-include-subdomains: "true"
+    nginx.ingress.kubernetes.io/content-security-policy: "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; object-src 'none'"
+    nginx.ingress.kubernetes.io/permissions-policy: "geolocation=(), microphone=(), camera=()"
+spec:
+  ingressClassName: external-nginx
+  rules:
+    - host: spred.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: user-interface
+                port:
+                  number: 443
+  tls:
+    - hosts:
+        - spred.io
+      secretName: spred-io

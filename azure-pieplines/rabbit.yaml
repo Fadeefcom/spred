@@ -1,0 +1,65 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger: none
+
+variables:
+- group: 'Spred-pieplines'
+
+stages:
+  - stage: Push
+    displayName: Push artifacts
+    jobs:
+      - job: Push
+        displayName: Push
+        pool:
+          vmImage: $(vmImageType)
+          name: $(vmImageName)
+        steps:
+          - task: PublishPipelineArtifact@1
+            inputs:
+              targetPath: '$(Pipeline.Workspace)/s/kubernetes/rabbit'
+              artifact: 'manifests'
+              publishLocation: 'pipeline'
+
+  - stage: Deploy
+    displayName: Deploy to dev
+    dependsOn: Push
+    jobs:
+      - deployment: Deploy
+        displayName: Deploy to AKS
+        environment: 'Azure subscription'
+        variables:
+          rabbitmqImage: 'rabbitmq:4.1-management'
+        pool:
+          vmImage: $(vmImageType)
+          name: $(vmImageName)
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: DownloadPipelineArtifact@2
+                  inputs:
+                    buildType: 'current'
+                    artifactName: 'manifests'
+                    targetPath: '$(Pipeline.Workspace)/manifests'
+                - task: replacetokens@6
+                  displayName: Replace Tokens
+                  inputs:
+                    rootDirectory: '$(Pipeline.Workspace)/manifests'
+                    targetFiles: 'rabbit.yaml'
+                    encoding: 'auto'
+                    writeBOM: true
+                    actionOnMissing: 'warn'
+                    enableTransforms: false
+                    enableRecursion: false
+                - task: KubernetesManifest@1
+                  inputs:
+                    action: 'deploy'
+                    namespace: 'rabbitmq'
+                    manifests: $(Pipeline.Workspace)/manifests/rabbit.yaml
+                    connectionType: 'kubernetesServiceConnection'
+                    containers: 'rabbitmq:4.1-management'
+                    kubernetesServiceConnection: '$(k8s-connection)'

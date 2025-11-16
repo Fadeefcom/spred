@@ -1,0 +1,100 @@
+﻿# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+variables:
+- group: 'Spred-pieplines'
+
+resources:
+- repo: self
+
+trigger: none
+
+pool:
+  vmImage: $(vmImageType)
+  name: $(vmImageName)
+
+stages:
+  - stage: Push
+    displayName: Push artifacts
+    jobs:
+      - job: Push
+        displayName: Push
+        pool:
+          vmImage: $(vmImageType)
+          name: $(vmImageName)
+        steps:
+          - task: PublishPipelineArtifact@1
+            inputs:
+              targetPath: '$(Pipeline.Workspace)/s/kubernetes/configuration'
+              artifact: 'configuration_manifests'
+              publishLocation: 'pipeline'
+
+  - stage: Deploy
+    displayName: Deploy to dev
+    dependsOn: Push
+    variables:
+      client-id: $(secret-client-id)
+      key-vault-name: $(secret-key-vault-name)
+      tenant-id: $(secret-tenant-id)
+    jobs:
+      - deployment: Deploy
+        displayName: Deploy to AKS
+        environment: 'Azure subscription'
+        pool:
+          vmImage: $(vmImageType)
+          name: $(vmImageName)
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: DownloadPipelineArtifact@2
+                  inputs:
+                    buildType: 'current'
+                    artifactName: 'configuration_manifests'
+                    targetPath: '$(Pipeline.Workspace)/a/configuration_manifests'
+                - task: KubernetesManifest@1
+                  displayName: Create imagePullSecret
+                  inputs:
+                    action: 'createSecret'
+                    namespace: 'default'
+                    secretType: 'dockerRegistry'
+                    secretName: 'acr-secret'
+                    connectionType: 'kubernetesServiceConnection'
+                    kubernetesServiceConnection: '$(k8s-connection)'
+                    dockerRegistryEndpoint: '$(docker-registry-connection)'
+                - task: replacetokens@5
+                  inputs:
+                    rootDirectory: '$(Pipeline.Workspace)/a/configuration_manifests'
+                    targetFiles: 'secretAzureProvider.yaml;rabbitmq_secert.yaml;redis_secret.yaml'
+                    encoding: 'auto'
+                    writeBOM: true
+                    actionOnMissing: 'warn'
+                    enableTransforms: false
+                    enableRecursion: false
+                - task: KubernetesManifest@1
+                  inputs:
+                    action: 'deploy'
+                    connectionType: 'kubernetesServiceConnection'
+                    kubernetesServiceConnection: '$(k8s-connection)'
+                    namespace: 'default'
+                    manifests: |
+                      $(Pipeline.Workspace)/a/configuration_manifests/issuer-production.yaml
+                      $(Pipeline.Workspace)/a/configuration_manifests/secretAzureProvider.yaml
+                - task: KubernetesManifest@1
+                  inputs:
+                    action: 'deploy'
+                    connectionType: 'kubernetesServiceConnection'
+                    kubernetesServiceConnection: '$(k8s-connection)'
+                    namespace: 'rabbitmq'
+                    manifests: |
+                      $(Pipeline.Workspace)/a/configuration_manifests/rabbitmq_secert.yaml
+                - task: KubernetesManifest@1
+                  inputs:
+                    action: 'deploy'
+                    connectionType: 'kubernetesServiceConnection'
+                    kubernetesServiceConnection: '$(k8s-connection)'
+                    namespace: 'redis'
+                    manifests: |
+                      $(Pipeline.Workspace)/a/configuration_manifests/redis_secret.yaml

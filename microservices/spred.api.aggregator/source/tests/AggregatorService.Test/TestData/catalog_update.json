@@ -1,0 +1,190 @@
+{
+  "obj": {
+    "id": 26399735,
+    "name": "Dance Floor Feels",
+    "playlist_id": "70kA7psKo9FAoFjKPClLDP",
+    "description": "Happy tears, memories made, a long embrace with a friend, sub that rattles your ribs",
+    "image_url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000d72ce2d47b1785af69ec4651eefa",
+    "sys_last_updated": "2025-06-05T00:00:00.000Z",
+    "last_updated": "2025-06-05T13:10:07.000Z",
+    "personalized": false,
+    "code2": null,
+    "owner_name": "EXIST.",
+    "owner_id": 31651745,
+    "user_id": "07rxnujphw9fwhoptbf2amonx",
+    "editorial": false,
+    "tags": [
+      {
+        "id": 462887,
+        "name": "Electronic"
+      },
+      {
+        "id": 462885,
+        "name": "Dance"
+      },
+      {
+        "id": 462890,
+        "name": "House"
+      }
+    ],
+    "followers": 4317,
+    "num_track": 105,
+    "fdiff_week": 26,
+    "fdiff_month": 104,
+    "catalog": "frontline",
+    "active_ratio": 0.180952,
+    "suspicion_score": 0,
+    "mood_smart_ordered": [
+      {
+        "1": 504954
+      },
+      {
+        "2": 504951
+      },
+      {
+        "3": 504917
+      },
+      {
+        "4": 504956
+      },
+      {
+        "5": 504931
+      },
+      {
+        "6": 504991
+      },
+      {
+        "7": 505015
+      },
+      {
+        "8": 504993
+      }
+    ],
+    "activity_smart_ordered": [
+      {
+        "1": 504872
+      },
+      {
+        "2": 504877
+      },
+      {
+        "3": 504874
+      },
+      {
+        "4": 504903
+      },
+      {
+        "5": 504871
+      },
+      {
+        "6": 504887
+      },
+      {
+        "7": 504873
+      },
+      {
+        "8": 504876
+      }
+    ],
+    "moods": [
+      {
+        "id": 504954,
+        "name": "energetic",
+        "isParentTag": false,
+        "rank": 1
+      },
+      {
+        "id": 504951,
+        "name": "emotional",
+        "isParentTag": false,
+        "rank": 2
+      },
+      {
+        "id": 504917,
+        "name": "atmospheric",
+        "isParentTag": false,
+        "rank": 3
+      },
+      {
+        "id": 504956,
+        "name": "entertaining",
+        "isParentTag": false,
+        "rank": 4
+      },
+      {
+        "id": 504931,
+        "name": "chill",
+        "isParentTag": false,
+        "rank": 5
+      },
+      {
+        "id": 504991,
+        "name": "heartwarming",
+        "isParentTag": false,
+        "rank": 6
+      },
+      {
+        "id": 505015,
+        "name": "melancholic",
+        "isParentTag": false,
+        "rank": 7
+      },
+      {
+        "id": 504993,
+        "name": "hopeful",
+        "isParentTag": false,
+        "rank": 8
+      }
+    ],
+    "activities": [
+      {
+        "id": 504872,
+        "name": "dancy",
+        "isParentTag": false,
+        "rank": 1
+      },
+      {
+        "id": 504877,
+        "name": "self-love",
+        "isParentTag": false,
+        "rank": 2
+      },
+      {
+        "id": 504874,
+        "name": "driving",
+        "isParentTag": false,
+        "rank": 3
+      },
+      {
+        "id": 504903,
+        "name": "late-night",
+        "isParentTag": false,
+        "rank": 4
+      },
+      {
+        "id": 504871,
+        "name": "bonding",
+        "isParentTag": false,
+        "rank": 5
+      },
+      {
+        "id": 504887,
+        "name": "reassured",
+        "isParentTag": false,
+        "rank": 6
+      },
+      {
+        "id": 504873,
+        "name": "daydreaming",
+        "isParentTag": false,
+        "rank": 7
+      },
+      {
+        "id": 504876,
+        "name": "partying",
+        "isParentTag": false,
+        "rank": 8
+      }
+    ]
+  }
+}

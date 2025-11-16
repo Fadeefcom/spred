@@ -1,0 +1,85 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger: none
+
+variables:
+- group: 'Spred-pieplines'
+
+stages:
+  - stage: Push
+    displayName: Push artifacts
+    jobs:
+      - job: Push
+        displayName: Push
+        pool:
+          vmImage: $(vmImageType)
+          name: $(vmImageName)
+        steps:
+          - task: PublishPipelineArtifact@1
+            inputs:
+              targetPath: '$(Pipeline.Workspace)/s/kubernetes/eventstore'
+              artifact: 'manifests'
+              publishLocation: 'pipeline'
+
+  - stage: Deploy
+    displayName: Deploy to dev
+    dependsOn: Push
+    jobs:
+      - deployment: Deploy
+        displayName: Deploy to AKS
+        environment: 'Azure subscription'
+        variables:
+          container-registry: 'eventstore/eventstore:23.10.0-jammy'
+        pool:
+          vmImage: $(vmImageType)
+          name: $(vmImageName)
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: DownloadPipelineArtifact@2
+                  inputs:
+                    buildType: 'current'
+                    artifactName: 'manifests'
+                    targetPath: '$(Pipeline.Workspace)/manifests'
+                - task: replacetokens@6
+                  displayName: Replace Tokens
+                  inputs:
+                    rootDirectory: '$(Pipeline.Workspace)/manifests'
+                    targetFiles: 'pv-azuredisk.yaml'
+                    encoding: 'auto'
+                    writeBOM: true
+                    actionOnMissing: 'warn'
+                    enableTransforms: false
+                    enableRecursion: false                    
+                - task: replacetokens@6
+                  displayName: Replace Tokens
+                  inputs:
+                    rootDirectory: '$(Pipeline.Workspace)/manifests'
+                    targetFiles: 'eventstore.yaml'
+                    encoding: 'auto'
+                    writeBOM: true
+                    actionOnMissing: 'warn'
+                    enableTransforms: false
+                    enableRecursion: false
+                - task: KubernetesManifest@1
+                  inputs:
+                    action: 'deploy'
+                    namespace: 'default'
+                    manifests: $(Pipeline.Workspace)/manifests/eventstore.yaml
+                    containers: 'eventstore/eventstore:23.10.0-jammy'
+                    connectionType: 'kubernetesServiceConnection'
+                    kubernetesServiceConnection: '$(k8s-connection)'
+                - task: KubernetesManifest@1
+                  inputs:
+                    action: 'deploy'
+                    namespace: 'default'
+                    manifests: |
+                      $(Pipeline.Workspace)/manifests/pv-azuredisk.yaml
+                      $(Pipeline.Workspace)/manifests/pvc-azuredisk.yaml
+                      $(Pipeline.Workspace)/manifests/service.yaml
+                    connectionType: 'kubernetesServiceConnection'
+                    kubernetesServiceConnection: '$(k8s-connection)'

@@ -1,0 +1,102 @@
+trigger: none
+
+pr:
+  branches:
+    include:
+      - main
+
+variables:
+- group: 'Spred-pieplines'
+- name: environment
+  value: Production
+- name: buildConfiguration
+  value: Release
+- name: projectName
+  value: InferenceService
+
+stages:
+- stage: TestAndCoverage
+  displayName: 'Run tests and check coverage'
+  jobs:
+  - job: test_job
+    displayName: 'Run tests and validate coverage'
+    pool:
+      vmImage: $(vmImageType)
+      name: $(vmImageName)
+    steps:
+
+    - task: UseDotNet@2
+      inputs:
+        packageType: 'sdk'
+        version: '9.0.x'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Restore'
+      inputs:
+        command: 'restore'
+        projects: 'source/$(projectName)/$(projectName).csproj'
+        feedsToUse: 'config'
+        nugetConfigPath: 'source/nuget.config'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Build'
+      inputs:
+        command: 'build'
+        projects: '**/$(projectName).csproj'
+        arguments: '--configuration $(buildConfiguration)'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Test'
+      inputs:
+        command: 'test'
+        projects: 'source/tests/$(projectName).Test/$(projectName).Test.csproj'
+        arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=$(System.DefaultWorkingDirectory)/source/tests/coverage/coverage /p:Exclude="[xunit.*]*" /p:Threshold=80 /p:ThresholdType=Class'
+        testRunTitle: 'Test with coverage'
+        publishTestResults: true
+
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish code coverage'
+      inputs:
+        targetPath: 'source/tests/coverage'
+        artifact: 'code-coverage'
+        publishLocation: 'pipeline'
+
+    - task: Bash@3
+      displayName: 'Install ReportGenerator'
+      inputs:
+        targetType: 'inline'
+        script: |
+          dotnet tool install --global dotnet-reportgenerator-globaltool --version 5.3.5
+          echo "##vso[task.setvariable variable=PATH]$PATH:$HOME/.dotnet/tools"
+
+    - task: Bash@3
+      displayName: 'Generate coverage report'
+      inputs:
+        targetType: 'inline'
+        script: |
+          reportgenerator "-reports:source/tests/coverage/coverage.opencover.xml" "-targetdir:coverage-report" "-reporttypes:HtmlInline_AzurePipelines;XmlSummary"
+
+    - task: Bash@3
+      displayName: 'Fail if any class is not 80% covered'
+      inputs:
+        targetType: 'inline'
+        script: |
+          summary="coverage-report/Summary.xml"
+          failures=()
+
+          while IFS= read -r line; do
+            name=$(echo "$line" | grep -oP 'name="\K[^"]+')
+            coverage=$(grep -oP 'coverage="\K[0-9.]+' <<< "$line" | tr -d '\r\n')
+
+            if [[ "$coverage" =~ ^[0-9]+(\.[0-9]+)?$ ]] && (( $(echo "$coverage < 80" | bc -l) )); then
+              failures+=("$name: $coverage%")
+            fi
+          done < <(grep '<Class ' "$summary")
+
+          if [ "${#failures[@]}" -gt 0 ]; then
+            printf -v msg "%s\n" "${failures[@]}"
+            echo "##vso[task.logissue type=error]Following classes are not fully covered:\n$msg"
+            exit 1
+          else
+            echo "All classes are fully covered."
+          fi

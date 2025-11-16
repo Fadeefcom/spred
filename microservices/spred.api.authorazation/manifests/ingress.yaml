@@ -1,0 +1,171 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: auth-service-ingress-v2-secure
+  annotations:
+    cert-manager.io/cluster-issuer: production
+    nginx.ingress.kubernetes.io/limit-rps: "5"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "30"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-body-size: "16m"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "8k"
+    nginx.ingress.kubernetes.io/limit-connections: "20"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://spred.io"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, PUT, POST, DELETE, PATCH, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "Authorization,Content-Type,X-Requested-With,Accept,Origin,Referer,x-client-deviceid,User-Agent"
+    nginx.ingress.kubernetes.io/cors-expose-headers: "Content-Length,Content-Range"
+    nginx.ingress.kubernetes.io/cors-max-age: "86400"
+Ниже — актуализированный блок paths (остальной манифест без изменений):
+
+spec:
+  ingressClassName: external-nginx
+  rules:
+    - host: api.spred.io
+      http:
+        paths:
+          - path: /auth/external/login
+            pathType: Exact
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8080
+          - path: /auth/login
+            pathType: Exact
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8080
+          - path: /auth/logout
+            pathType: Exact
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8080
+          - path: /auth/init
+            pathType: Exact
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8080
+
+          - path: /auth/soundcloud
+            pathType: Exact
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8080
+          - path: /auth/youtube-music
+            pathType: Exact
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8080
+
+          - path: /user/me
+            pathType: Exact
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8080
+          - path: /user/me/avatar
+            pathType: Exact
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8080
+          - path: /user/authentications
+            pathType: Exact
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8080
+          - path: /user/token
+            pathType: Exact
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8080
+          - path: /user/notify
+            pathType: Exact
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8080
+          - path: /user/feedback
+            pathType: Exact
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8080
+
+          - path: /user/accounts
+            pathType: Prefix
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8080
+
+          - path: /auth/signin-yandex
+            pathType: Exact
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8080
+          - path: /auth/signin-spotify
+            pathType: Exact
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8080
+          - path: /auth/signin-google
+            pathType: Exact
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8080
+          - path: /auth/signin-microsoft
+            pathType: Exact
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8080
+          - path: /auth/signin-soundcloud
+            pathType: Exact
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8080
+          - path: /auth/signin-youtube
+            pathType: Exact
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8080
+  tls:
+    - hosts:
+        - api.spred.io
+      secretName: api-spred-io

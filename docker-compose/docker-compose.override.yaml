@@ -1,0 +1,41 @@
+services:
+
+  playlistapi:
+    ports:
+      - "5082:8080"
+
+  authorizationapi:
+    ports:
+      - "5081:8080"
+
+  trackapi:
+    ports:
+      - "5080:8080"
+  
+  inferenceapi:
+    ports:
+      - "5083:8080"
+
+  aggregatorapi:
+    ports:
+      - "5084:8080"
+  
+  vector-db-api:
+    ports:
+      - "5085:8000"
+
+  submissionapi:
+    ports:
+      - "5086:8080"
+
+  subscriptionapi:
+    ports:
+      - "5088:8080"
+
+  activityapi:
+    ports:
+      - "5087:8080"
+  
+  # userinterface:
+  #   ports: 
+  #     - "8080:8080"
